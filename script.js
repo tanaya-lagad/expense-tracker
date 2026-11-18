@@ -17,7 +17,19 @@ form.addEventListener("submit",function(event){
     const date = dateInput.value;
 
     const li = document.createElement("li");
+
     li.textContent = `${name} - RS.${amount} (${category},${date})`;
+    
+    const deleteBtn=document.createElement("button");
+    deleteBtn.textContent = "Delete";
+
+    deleteBtn.addEventListener("click",function(){
+        li.remove();
+        totalAmount -=amount;
+        totalText.textContent = totalAmount;
+    });
+
+    li.appendChild(deleteBtn);
     list.appendChild(li);
 
     totalAmount +=amount;
