@@ -6,35 +6,45 @@ const dateInput = document.getElementById("date");
 const list = document.getElementById("expenseList");
 const totalText = document.getElementById("total");
 
-let totalAmount = 0;
+let  expense = JSON.parse(localStorage.getItem("expenses")) ||[];
+//let totalAmount = 0;
+
+function showExpenses(){
+    list.innerHTML = "";
+    let total = 0;
+
+    showExpenses.forEach(function(exp,index){
+        const li = document.createElement("li");
+        li.textContent = `${exp.name} - RS.${exp.amount} (${exp.category},${exp.date})`;
+
+        const deleteBtn = document.createElement("button");
+        deleteBtn.textContent = "Delete";
+        deleteBtn.addEventListener("click",function(){
+            showExpenses.splice(index, 1);
+            saveAndshow();
+        });
+
+        li.appendChild(deleteBtn);
+        list.appendChild(li);
+        total +=exp.amount;
+    });
+
+    totalText.textContent = total;
+}
+
 
 form.addEventListener("submit",function(event){
     event.preventDefault();
 
-    const name = nameInput.value;
-    const amount = Number(amountInput.value);
-    const category = categoryInput.value;
-    const date = dateInput.value;
-
-    const li = document.createElement("li");
-
-    li.textContent = `${name} - RS.${amount} (${category},${date})`;
-    
-    const deleteBtn=document.createElement("button");
-    deleteBtn.textContent = "Delete";
-
-    deleteBtn.addEventListener("click",function(){
-        li.remove();
-        totalAmount -=amount;
-        totalText.textContent = totalAmount;
+    expenses.push({
+        name: nameInput.value,
+        amount: Number(amountInput.value),
+        category: categoryInput.value,
+        date: dateInput.value
     });
 
-    li.appendChild(deleteBtn);
-    list.appendChild(li);
-
-    totalAmount +=amount;
-    totalText.textContent = totalAmount;
-
-    form.requestFullscreen();
-
+    saveAndShow();
+    form.reset();
 });
+
+showExpenses();
