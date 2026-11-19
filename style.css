@@ -77,3 +77,8 @@ li button{
     background: #e53935;
     padding: 6px 12px;
 }
+
+.chart-box{
+    max-width: 350px;
+    margin: 20px auto;
+}

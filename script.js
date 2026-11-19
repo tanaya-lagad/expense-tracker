@@ -1,3 +1,6 @@
+const chartCanvas = document.getElementById("chart");
+let chart;
+
 const form = document.getElementById("expenseForm");
 const nameInput = document.getElementById("name");
 const amountInput = document.getElementById("amount");
@@ -6,45 +9,69 @@ const dateInput = document.getElementById("date");
 const list = document.getElementById("expenseList");
 const totalText = document.getElementById("total");
 
-let  expense = JSON.parse(localStorage.getItem("expenses")) ||[];
-//let totalAmount = 0;
+let expenses = JSON.parse(localStorage.getItem("expenses")) || [];   // ← expenses
 
-function showExpenses(){
-    list.innerHTML = "";
-    let total = 0;
+function showExpenses() {
+  list.innerHTML = "";
+  let total = 0;
 
-    showExpenses.forEach(function(exp,index){
-        const li = document.createElement("li");
-        li.textContent = `${exp.name} - RS.${exp.amount} (${exp.category},${exp.date})`;
+  expenses.forEach(function (exp, index) {                            // ← expenses
+    const li = document.createElement("li");
+    li.textContent = `${exp.name} - Rs.${exp.amount} (${exp.category}, ${exp.date}) `;
 
-        const deleteBtn = document.createElement("button");
-        deleteBtn.textContent = "Delete";
-        deleteBtn.addEventListener("click",function(){
-            showExpenses.splice(index, 1);
-            saveAndshow();
-        });
-
-        li.appendChild(deleteBtn);
-        list.appendChild(li);
-        total +=exp.amount;
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.addEventListener("click", function () {
+      expenses.splice(index, 1);                                      // ← expenses
+      saveAndShow();                                                  // ← capital S
     });
 
-    totalText.textContent = total;
+    li.appendChild(deleteBtn);
+    list.appendChild(li);
+    total += exp.amount;
+  });
+
+  totalText.textContent = total;
+  showChart();                                                        // ← NEW
 }
 
+function saveAndShow() {                                              // ← was missing
+  localStorage.setItem("expenses", JSON.stringify(expenses));
+  showExpenses();
+}
 
-form.addEventListener("submit",function(event){
-    event.preventDefault();
+function showChart() {                                                // ← NEW (chart)
+  const totals = {};
 
-    expenses.push({
-        name: nameInput.value,
-        amount: Number(amountInput.value),
-        category: categoryInput.value,
-        date: dateInput.value
-    });
+  expenses.forEach(function (exp) {
+    totals[exp.category] = (totals[exp.category] || 0) + exp.amount;
+  });
 
-    saveAndShow();
-    form.reset();
+  if (chart) {
+    chart.destroy();
+  }
+
+  chart = new Chart(chartCanvas, {
+    type: "pie",
+    data: {
+      labels: Object.keys(totals),
+      datasets: [{ data: Object.values(totals) }]
+    }
+  });
+}
+
+form.addEventListener("submit", function (event) {
+  event.preventDefault();
+
+  expenses.push({
+    name: nameInput.value,
+    amount: Number(amountInput.value),
+    category: categoryInput.value,
+    date: dateInput.value
+  });
+
+  saveAndShow();
+  form.reset();
 });
 
 showExpenses();
